@@ -1,1 +1,1 @@
-# sugid-clearer
+# s[ug]id-clearer

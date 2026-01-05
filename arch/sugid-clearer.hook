@@ -1,0 +1,9 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = *
+
+[Action]
+Description = sugid-clearer
+When = PostTransaction
+Exec = /usr/local/bin/sugid-clearer -c

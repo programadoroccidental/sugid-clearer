@@ -1,0 +1,83 @@
+#!/bin/sh
+
+SUGID_FILE=/etc/sugid-clearer/sugid_files.txt
+
+usage() {
+	printf '%s\n' "usage: ${0##*/} [-c|--clear] [-f|--file]"
+}
+
+print_error() {
+	printf '\e[1;38;5;1m%s\e[m\n' "$1" >&2
+}
+
+check_root() {
+	if [ "$(id -u)" -ne 0 ]; then
+		print_error "Permission denied"
+		exit 1
+	fi
+}
+
+clear() {
+	if [ ! -f "$SUGID_FILE" ]; then
+        print_error "$SUGID_FILE: S[UG]ID file not found"
+		exit 1
+    fi
+
+	while read -r file; do
+		case "$file" in
+			'' | \#*) continue  ;;
+		esac
+
+		turn_off "$file"
+
+	done < "$SUGID_FILE"
+}
+
+turn_off() {
+	file="$1"
+	if [ -u "$file" ] || [ -g "$file" ]; then
+		chmod -s "$file"
+		printf '%s\n' "$file: S[UG]ID bit turned off"
+	fi
+}
+
+
+optclear=0
+while :; do
+	case "$1" in
+		-h | --h | --he | --hel | --help)
+			usage
+			exit 0
+		;;
+
+		-c | --clear)
+			optclear=1
+		;;
+
+		-f | --file)
+			shift
+			SUGID_FILE="$1"
+		;;
+
+		-*)	 
+			print_error "Unknown option: $1"
+			usage
+			exit 1
+		;;
+
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+if [ "$optclear" -eq 1 ]; then
+	check_root
+	clear
+	exit 0
+fi
+
+# Find files with either the SUID or SGID bit
+printf '%s\n' "S[UG]ID files"
+find / -type f -perm /6000 -exec ls -lh {} \; 2> /dev/null
