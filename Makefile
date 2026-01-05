@@ -9,7 +9,7 @@ install:
 	install -m600 sugid_files.txt $(DESTDIR)/etc/sugid-clearer
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(PROG) \
+	rm -rf $(DESTDIR)$(PREFIX)/bin/$(PROG) \
 		$(DESTDIR)/etc/sugid-clearer
 
 GPGKEY ?= 9635F79DD28A4A2D42385AD1D2FDE81DBBAFBE5C
